@@ -43,7 +43,10 @@ function endIndex(data) {
 
     for (var i = 0, l = endBlocks.length; i < l; i++) {
         var index = data.indexOf(endBlocks[i]);
-        firstIndex = firstIndex === -1 ? index : Math.min(index, firstIndex);
+
+        if (index !== -1) {
+            firstIndex = firstIndex === -1 ? index : Math.min(index, firstIndex);
+        }
     }
 
     return data.indexOf(delimiter, firstIndex) + delimiter.length;
