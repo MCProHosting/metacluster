@@ -9,15 +9,14 @@ var Pool = new pool(config.servers);
 
 function Client (socket) {
     var self   = this,
+        isOpen = true,
         spool  = new Buffer(0);
 
     var queue = async.queue(function (command, callback) {
-        console.log('---------------------------');
-        console.log('Executing: ' + command);
-        console.log('===');
         Pool.run(command, function (result) {
-            console.log('Writing: ' + result);
-            socket.write(result);
+            if (isOpen) {
+                socket.write(result);
+            }
             callback();
         });
     });
@@ -33,7 +32,10 @@ function Client (socket) {
             pushCommands();
         });
 
-        socket.on('close', pushCommands);
+        socket.on('close', function () {
+            isOpen = false;
+            pushCommands();
+        });
     };
 
     /**
@@ -44,10 +46,9 @@ function Client (socket) {
      */
     function pushCommands () {
         var commands = [];
-
+        
         while (true) {
             var index = buft.indexOf(spool, parser.delimiter);
-
             if (index === -1) {
                 break;
             }

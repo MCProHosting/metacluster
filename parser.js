@@ -10,7 +10,19 @@ var delimiter = '\r\n';
  * @returns {boolean}
  */
 function isWrite(query) {
-    return !_.some(['get', 'stats', 'version', 'cas'], function (action) {
+    return !_.some(['get', 'stats', 'version'], function (action) {
+        return query.indexOf(action) === 0;
+    });
+}
+
+/**
+ * Returns whether the given action wants a "block" of data
+ *
+ * @param {string} query
+ * @returns {boolean}
+ */
+function getsData(query) {
+    return _.some(['set', 'add', 'replace', 'ammend', 'prepend', 'cas'], function (action) {
         return query.indexOf(action) === 0;
     });
 }
@@ -23,7 +35,7 @@ function isWrite(query) {
  * @returns {number}
  */
 function wantsData(query) {
-    if (!isWrite(query)) {
+    if (!getsData(query)) {
         return 0;
     }
 
