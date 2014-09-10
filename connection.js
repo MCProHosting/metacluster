@@ -16,9 +16,8 @@ function Connection (port, host) {
     self.attempts = 0;
 
     self.queue = async.queue(function (query, callback) {
-        console.log('sending: ' + query.query.trim());
         self.client.write(query.query.trim() + parser.delimiter);
-        
+
         self.on('chunk', function (data) {
             query.callback(data);
             self.removeAllListeners('chunk');
@@ -88,7 +87,6 @@ function Connection (port, host) {
 
         self.client.on('data', function (data) {
             spool = Buffer.concat([spool, data]);
-            console.log('DATA:' + spool.toString());
             var pos = parser.endIndex(spool);
 
             if (pos !== -1) {

@@ -45,7 +45,7 @@ function wantsData(query) {
 /**
  * Calculates the length, in bytes, of the string. We can't just use str.length,
  * because each one utf character is actually two bytes, and it will fail.
- *  
+ *
  * @param  {string} str
  * @return {number}
  */

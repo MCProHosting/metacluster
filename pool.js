@@ -33,7 +33,7 @@ function Pool(servers) {
 
     /**
      * Executes a write query on all clusters.
-     * 
+     *
      * @param  {string}   query
      * @param  {Function} callback
      * @return {void}
@@ -52,7 +52,7 @@ function Pool(servers) {
 
     /**
      * Selects a server and runs a read type query on it.
-     * 
+     *
      * @param  {string}   query
      * @param  {Function} callback
      * @return {void}

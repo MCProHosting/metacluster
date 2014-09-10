@@ -46,7 +46,7 @@ function Client (socket) {
      */
     function pushCommands () {
         var commands = [];
-        
+
         while (true) {
             var index = buft.indexOf(spool, parser.delimiter);
             if (index === -1) {
