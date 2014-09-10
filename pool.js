@@ -26,10 +26,11 @@ function Pool(servers) {
     self.run = function (query, callback) {
         if (parser.isWrite(query)) {
             for (var i = 0, l = self.servers.length; i < l; i++) {
+                var hasGivenCallback = false;
                 runOn(self.servers[i], query, function (data) {
-                    if (callback) {
+                    if (!hasGivenCallback) {
                         callback(data);
-                        callback = null;
+                        hasGivenCallback = true;
                     }
                 });
             }

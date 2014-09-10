@@ -29,8 +29,29 @@ function wantsData(query) {
     return parseInt(query.split(' ')[4], 10);
 }
 
+/**
+ * Gets the index of the first end position of the data.
+ * @param data
+ * @returns {number}
+ */
+function endIndex(data) {
+    var endBlocks = [
+        'END', 'STORED', 'NOT_STORED', 'EXISTS', 'NOT_FOUND', 'DELETED', 'NOT_FOUND',
+        'TOUCHED', 'OK', 'BUSY', 'BADCLASS', 'NOSPARE', 'NOTFULL', 'UNSAFE', 'SAME',
+        'ERROR', 'CLIENT_ERROR', 'SERVER_ERROR'
+    ], firstIndex = -1;
+
+    for (var i = 0, l = endBlocks.length; i < l; i++) {
+        var index = data.indexOf(endBlocks[i]);
+        firstIndex = firstIndex === -1 ? index : Math.min(index, firstIndex);
+    }
+
+    return data.indexOf(delimiter, firstIndex) + delimiter.length;
+}
+
 module.exports = {
     isWrite: isWrite,
     wantsData: wantsData,
+    endIndex: endIndex,
     delimiter: delimiter
 };

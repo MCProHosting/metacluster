@@ -98,11 +98,11 @@ function MemcachedRecord (port, host, local) {
 
         self.client.on('data', function (data) {
             spool += data.toString('utf8');
-            var pos = spool.indexOf('END');
+            var pos = parser.endIndex(spool);
 
             if (pos !== -1) {
-                self.emit('chunk', spool.slice(0, pos + 3));
-                spool = spool.slice(pos + 3);
+                self.emit('chunk', spool.slice(0, pos));
+                spool = spool.slice(pos);
             }
         });
     }
