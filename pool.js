@@ -25,27 +25,51 @@ function Pool(servers) {
      */
     self.run = function (query, callback) {
         if (parser.isWrite(query)) {
-            for (var i = 0, l = self.servers.length; i < l; i++) {
-                var hasGivenCallback = false;
-                self.servers[i].write(query, function (data) {
-                    if (!hasGivenCallback) {
-                        callback(data);
-                        hasGivenCallback = true;
-                    }
-                });
-            }
+            callWriteQuery(query, callback);
+        } else {
+            callReadQuery(query, callback);
         }
+    };
 
+    /**
+     * Executes a write query on all clusters.
+     * 
+     * @param  {string}   query
+     * @param  {Function} callback
+     * @return {void}
+     */
+    function callWriteQuery(query, callback) {
+        for (var i = 0, l = self.servers.length; i < l; i++) {
+            var hasGivenCallback = false;
+            self.servers[i].write(query, function (data) {
+                if (!hasGivenCallback) {
+                    callback(data);
+                    hasGivenCallback = true;
+                }
+            });
+        }
+    }
+
+    /**
+     * Selects a server and runs a read type query on it.
+     * 
+     * @param  {string}   query
+     * @param  {Function} callback
+     * @return {void}
+     */
+    function callReadQuery(query, callback) {
         var available = _.where(self.servers, {status: 'online'}),
             locals = _.where(available, {local: true});
 
         if (available.length === 0) {
             // No need to log, we'll already have logged that they're down!
-            callback('ERROR');
+            return _.defer(function () {
+                callback('ERROR');
+            });
         }
 
-        _.sample(locals.length ? locals : available).write(query, callback)
-    };
+        _.sample(locals.length ? locals : available).write(query, callback);
+    }
 }
 
 module.exports = Pool;

@@ -16,6 +16,7 @@ function Connection (port, host) {
     self.attempts = 0;
 
     self.queue = async.queue(function (query, callback) {
+        console.log('sending: ' + query.query.trim());
         self.client.write(query.query.trim() + parser.delimiter);
         
         self.on('chunk', function (data) {
@@ -80,8 +81,14 @@ function Connection (port, host) {
             self.error = 'Connection error ' + e;
         });
 
+        self.client.on('end', function (e) {
+            self.emit('status', 'offline');
+            self.error = 'Connection ended.';
+        });
+
         self.client.on('data', function (data) {
             spool = Buffer.concat([spool, data]);
+            console.log('DATA:' + spool.toString());
             var pos = parser.endIndex(spool);
 
             if (pos !== -1) {

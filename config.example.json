@@ -1,7 +1,7 @@
 {
     "http": {
         "host": "127.0.0.1",
-        "port": 8080
+        "port": 11211
     },
     "performance": {
         "failRetries": 20,
@@ -9,12 +9,13 @@
     },
     "servers": [{
         "host": "127.0.0.1",
-        "port": 11211
+        "port": 1211,
+        "local": true
     }, {
         "host": "127.0.0.1",
-        "port": 11212
+        "port": 1212
     }, {
         "host": "127.0.0.1",
-        "port": 11213
+        "port": 1213
     }]
 }

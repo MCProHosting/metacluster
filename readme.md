@@ -17,3 +17,7 @@ Ensure you have node.js installed locally.
  1. Run `npm install`
  2. Copy `config.example.json` to `config.json` and fill in your details.
  3. To start the daemon, run `npm start`.
+
+### Tests
+
+We use the functional tests of the node-memcached adapter to ensure memcluster exhibits the correct behaviour.

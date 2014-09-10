@@ -2,6 +2,7 @@ var net    = require('net'),
     pool   = require('./pool'),
     parser = require('./parser'),
     config = require('./config'),
+    async  = require('async'),
     buft   = require('buffertools');
 
 var Pool = new pool(config.servers);
@@ -10,38 +11,38 @@ function Client (socket) {
     var self   = this,
         spool  = new Buffer(0);
 
-    /**
-     * Dispatches all commands on the spool.
-     */
-    self.processSpool = function () {
-        getCommands().map(function (command) {
-            Pool.run(command, function (result) {
-                socket.write(result);
-            });
+    var queue = async.queue(function (command, callback) {
+        console.log('---------------------------');
+        console.log('Executing: ' + command);
+        console.log('===');
+        Pool.run(command, function (result) {
+            console.log('Writing: ' + result);
+            socket.write(result);
+            callback();
         });
-    };
+    });
 
     /**
      * Adds appropriate listeners to the socket.
      */
     self.boot = function () {
-        socket.setEncoding('binary');
+        socket.setEncoding('utf8');
 
         socket.on('data', function (data) {
             spool = Buffer.concat([spool, new Buffer(data)]);
-            self.processSpool();
+            pushCommands();
         });
 
-        socket.on('close', self.processSpool);
+        socket.on('close', pushCommands);
     };
 
     /**
-     * Returns an array of all commands in the buffer, removing them.
+     * Parses commands out of the spool buffer and send them to the async queue.
      *
      * @returns {string[]}
      * @see https://github.com/memcached/memcached/blob/master/doc/protocol.txt
      */
-    function getCommands () {
+    function pushCommands () {
         var commands = [];
 
         while (true) {
@@ -58,15 +59,14 @@ function Client (socket) {
             var query      = spool.slice(0, index),
                 dataLength = parser.wantsData(query.toString()),
                 terminus   = index + parser.delimiter.length + dataLength;
-            
+
             if (parser.len(spool.toString()) < terminus) {
                 break;
             }
 
-            commands.push(Buffer.concat([query, spool.slice(index, terminus)]).toString());
+            queue.push(Buffer.concat([query, spool.slice(index, terminus)]).toString());
             spool = spool.slice(terminus);
         }
-        console.log(commands);
 
         return commands;
     }

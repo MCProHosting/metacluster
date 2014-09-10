@@ -29,7 +29,7 @@ function MemcachedRecord (port, host, local) {
             throw Error('We should not try to connect to nodes which are not online!');
         }
 
-        c.shift().queue.push(query, callback);
+        c.shift().queue.push({query: query, callback: callback});
     };
 
     /**
