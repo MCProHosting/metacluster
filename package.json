@@ -10,7 +10,8 @@
     "winston": "^0.7.3"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "node node_modules/expresso/bin/expresso node_modules/memcache/test/*.js"
   },
   "repository": {
     "type": "git",
