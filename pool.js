@@ -1,0 +1,56 @@
+var record = require('./record'),
+    log    = require('./log'),
+    parser = require('./parser'),
+    _      = require('lodash');
+
+function Pool(servers) {
+    var self = this;
+    self.servers = [];
+
+    for (var i = 0, l = servers.length; i < l; i++) {
+        var server = servers[i];
+        self.servers.push(new record(server.port, server.host, server.local));
+    }
+
+    /**
+     * Runs the given command on appropriate servers. The callback will be
+     * triggered with data from the first valid response given by any
+     * server the command is executed on.
+     *
+     * Reads will be executed on a single cluster, local if possible.
+     * Writes will be run on all listed servers.
+     *
+     * @param {string} query
+     * @param {function} callback
+     */
+    self.run = function (query, callback) {
+        if (parser.isWrite(query)) {
+            for (var i = 0, l = self.servers.length; i < l; i++) {
+                runOn(self.servers[i], query, function (data) {
+                    if (callback) {
+                        callback(data);
+                        callback = null;
+                    }
+                });
+            }
+        }
+
+        var locals = _.where(self.servers, {local: true});
+        runOn(_.sample(locals.length || self.servers), query, callback)
+    };
+
+    /**
+     * Runs a command on the given server.
+     *
+     * @param {memcached.client} server
+     * @param {string} query
+     * @param {function} callback
+     */
+    function runOn(server, query, callback) {
+        server.write(query, function (data) {
+            callback(data);
+        });
+    }
+}
+
+module.exports = Pool;

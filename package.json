@@ -1,0 +1,23 @@
+{
+  "name": "memcluster",
+  "version": "0.0.0",
+  "description": "Vtgate-style cluster daemon for memcache targets",
+  "main": "index.js",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "winston": "^0.7.3"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://connor4312@github.com/MCProHosting/memcluster.git"
+  },
+  "author": "Connor Peet <connor@connorpeet.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MCProHosting/memcluster/issues"
+  },
+  "homepage": "https://github.com/MCProHosting/memcluster"
+}
