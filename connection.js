@@ -17,7 +17,7 @@ function Connection (port, host) {
 
     self.queue = async.queue(function (query, callback) {
         self.client.write(query.trim() + parser.delimiter);
-        
+
         self.on('chunk', function (data) {
             callback(data);
             self.removeAllListeners('chunk');

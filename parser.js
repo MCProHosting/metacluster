@@ -9,7 +9,7 @@ var delimiter = '\r\n';
  * @returns {boolean}
  */
 function isWrite(query) {
-    return ! _.some(['get', 'stats', 'version', 'cas'], function (action) {
+    return !_.some(['get', 'stats', 'version', 'cas'], function (action) {
         return query.indexOf(action) === 0;
     });
 }

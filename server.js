@@ -26,7 +26,7 @@ function Client (socket) {
     self.boot = function () {
         socket.setEncoding('binary');
 
-        socket.on('data',function (data) {
+        socket.on('data', function (data) {
             spool += data.toString('utf8');
             self.processSpool();
         });
