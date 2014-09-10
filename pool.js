@@ -27,7 +27,7 @@ function Pool(servers) {
         if (parser.isWrite(query)) {
             for (var i = 0, l = self.servers.length; i < l; i++) {
                 var hasGivenCallback = false;
-                runOn(self.servers[i], query, function (data) {
+                self.servers[i].write(query, function (data) {
                     if (!hasGivenCallback) {
                         callback(data);
                         hasGivenCallback = true;
@@ -44,21 +44,8 @@ function Pool(servers) {
             callback('ERROR');
         }
 
-        runOn(_.sample(locals.length ? locals : available), query, callback)
+        _.sample(locals.length ? locals : available).write(query, callback)
     };
-
-    /**
-     * Runs a command on the given server.
-     *
-     * @param {memcached.client} server
-     * @param {string} query
-     * @param {function} callback
-     */
-    function runOn(server, query, callback) {
-        server.write(query, function (data) {
-            callback(data);
-        });
-    }
 }
 
 module.exports = Pool;
