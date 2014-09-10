@@ -1,13 +1,14 @@
 var net    = require('net'),
     pool   = require('./pool'),
     parser = require('./parser'),
-    config = require('./config');
+    config = require('./config'),
+    buft   = require('buffertools');
 
 var Pool = new pool(config.servers);
 
 function Client (socket) {
     var self   = this,
-        spool  = '';
+        spool  = new Buffer(0);
 
     /**
      * Dispatches all commands on the spool.
@@ -27,7 +28,7 @@ function Client (socket) {
         socket.setEncoding('binary');
 
         socket.on('data', function (data) {
-            spool += data.toString('utf8');
+            spool = Buffer.concat([spool, new Buffer(data)]);
             self.processSpool();
         });
 
@@ -44,22 +45,28 @@ function Client (socket) {
         var commands = [];
 
         while (true) {
-            var index = spool.indexOf(parser.delimiter);
+            var index = buft.indexOf(spool, parser.delimiter);
+
             if (index === -1) {
                 break;
             }
+            if (index === 0) {
+                spool = spool.slice(parser.delimiter.length);
+                continue;
+            }
 
             var query      = spool.slice(0, index),
-                dataLength = parser.wantsData(query),
+                dataLength = parser.wantsData(query.toString()),
                 terminus   = index + parser.delimiter.length + dataLength;
-
-            if (spool.length < terminus) {
+            
+            if (parser.len(spool.toString()) < terminus) {
                 break;
             }
 
-            commands.push(query + spool.slice(index, terminus));
-            spool = spool.slice(terminus).trim();
+            commands.push(Buffer.concat([query, spool.slice(index, terminus)]).toString());
+            spool = spool.slice(terminus);
         }
+        console.log(commands);
 
         return commands;
     }

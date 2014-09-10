@@ -1,4 +1,5 @@
-var _ = require('lodash');
+var _    = require('lodash'),
+    buft = require('buffertools');
 
 var delimiter = '\r\n';
 
@@ -30,31 +31,43 @@ function wantsData(query) {
 }
 
 /**
+ * Calculates the length, in bytes, of the string. We can't just use str.length,
+ * because each one utf character is actually two bytes, and it will fail.
+ *  
+ * @param  {string} str
+ * @return {number}
+ */
+function len(str) {
+    return Buffer.byteLength(str);
+}
+
+/**
  * Gets the index of the first end position of the data.
- * @param data
+ * @param {Buffer} data
  * @returns {number}
  */
 function endIndex(data) {
     var endBlocks = [
         'END', 'STORED', 'NOT_STORED', 'EXISTS', 'NOT_FOUND', 'DELETED', 'NOT_FOUND',
         'TOUCHED', 'OK', 'BUSY', 'BADCLASS', 'NOSPARE', 'NOTFULL', 'UNSAFE', 'SAME',
-        'ERROR', 'CLIENT_ERROR', 'SERVER_ERROR'
+        'ERROR', 'CLIENT_ERROR', 'SERVER_ERROR', 'VERSION'
     ], firstIndex = -1;
 
     for (var i = 0, l = endBlocks.length; i < l; i++) {
-        var index = data.indexOf(endBlocks[i]);
+        var index = buft.indexOf(data, endBlocks[i]);
 
         if (index !== -1) {
             firstIndex = firstIndex === -1 ? index : Math.min(index, firstIndex);
         }
     }
 
-    return data.indexOf(delimiter, firstIndex) + delimiter.length;
+    return buft.indexOf(data, delimiter, firstIndex) + delimiter.length;
 }
 
 module.exports = {
     isWrite: isWrite,
     wantsData: wantsData,
     endIndex: endIndex,
+    len: len,
     delimiter: delimiter
 };

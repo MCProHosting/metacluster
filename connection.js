@@ -9,18 +9,20 @@ var log     = require('./log'),
 
 function Connection (port, host) {
     var self       = this,
-        spool      = '',
+        spool      = new Buffer(0),
         addrString = host + ':' + port,
         abortAfter = config.performance.failRetries;
 
     self.attempts = 0;
 
     self.queue = async.queue(function (query, callback) {
-        self.client.write(query.trim() + parser.delimiter);
-
+        self.client.write(query.query.trim() + parser.delimiter);
+        
         self.on('chunk', function (data) {
-            callback(data);
+            query.callback(data);
             self.removeAllListeners('chunk');
+
+            callback();
         });
     }, 1);
 
@@ -44,7 +46,7 @@ function Connection (port, host) {
         }
 
         if (self.attempts < abortAfter) {
-            return setTimeout(startClient, delay * 1000)
+            return setTimeout(startClient, delay * 1000);
         }
 
         log.error('Unable to connect to ' + addrString + ', aborted after '
@@ -79,11 +81,12 @@ function Connection (port, host) {
         });
 
         self.client.on('data', function (data) {
-            spool += data.toString('utf8');
+            spool = Buffer.concat([spool, data]);
             var pos = parser.endIndex(spool);
 
             if (pos !== -1) {
-                self.emit('chunk', spool.slice(0, pos));
+                var str = spool.slice(0, pos).toString();
+                self.emit('chunk', str);
                 spool = spool.slice(pos);
             }
         });
