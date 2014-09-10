@@ -3,6 +3,10 @@
         "host": "127.0.0.1",
         "port": 8080
     },
+    "performance": {
+        "failRetries": 20,
+        "connectionPool": 4
+    },
     "servers": [{
         "host": "127.0.0.1",
         "port": 11211
