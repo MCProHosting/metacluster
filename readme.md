@@ -4,6 +4,8 @@ Memcluster is a daemon to synchronize writes across multiple memcached servers o
 
 It effectively acts as a memcached proxy, allowing you to run memcluster on a server with many application instances, and interact with it like you would a normal memcached server.
 
+![Architecture Diagram](http://i.imgur.com/W1GNnO0.png)
+
 Writes are done asynchronously across the list of clusters, we only wait for the response from one server/cluster before returning to the application.
 
 Reads are done randomly amoungst the list of servers/clusters defined. Clusters with `local: true` in the config (indicating that they may be accessed with lower latency, i.e. they're in the same datacenter) will be prioritised over other instances.
