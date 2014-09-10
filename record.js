@@ -2,7 +2,9 @@ var log     = require('./log'),
     parser  = require('./parser'),
     emitter = require('events').EventEmitter,
     util    = require('util'),
-    net     = require('net');
+    net     = require('net'),
+    async   = require('async'),
+    _       = require('lodash');
 
 function MemcachedRecord (port, host, local) {
     var self       = this,
@@ -13,6 +15,26 @@ function MemcachedRecord (port, host, local) {
     self.abortAfter = 30;
     self.local = !! local;
 
+    // Debounce this to prevent filcker/proxy oddness
+    var isConnected = _.debounce(function () {
+        if (self.status !== 'offline') {
+            log.info('Connected to ' + addrString);
+            self.status = 'online';
+            self.error = null;
+            self.attempts = 0;
+        }
+    }, 5000);
+
+    // Queue to process commands in series.
+    var queue = async.queue(function (query, callback) {
+        self.client.write(query.trim() + parser.delimiter);
+
+        self.on('chunk', function (data) {
+            callback(data);
+            self.removeAllListeners('chunk');
+        });
+    }, 1);
+
     /**
      * Writes a command out to the connection, and calls
      * back with the output.
@@ -21,14 +43,7 @@ function MemcachedRecord (port, host, local) {
      * @param {function} callback
      */
     self.write = function (query, callback) {
-        console.log(query.trim() + parser.delimiter);
-        self.client.write(query.trim() + parser.delimiter);
-
-        self.on('chunk', function (data) {
-            console.log(data);
-            callback(data);
-            self.removeListener('chunk', callback);
-        });
+        queue.push(query, callback);
     };
 
     /**
@@ -51,14 +66,16 @@ function MemcachedRecord (port, host, local) {
             + self.abortAfter + ' attempts with error' + self.error);
     };
 
+    /**
+     * Tries to connect to this record's server, binding all
+     * socket events.
+     */
     function startClient() {
         self.client = net.createConnection(port, host);
 
         self.client.on('connect', function () {
-            log.info('Connected to ' + addrString);
-            self.status = 'online';
-            self.error = null;
-            self.attempts = 0;
+            self.status = 'establishing';
+            isConnected();
         });
 
         self.client.on('close', function () {

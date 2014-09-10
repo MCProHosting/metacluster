@@ -4,6 +4,7 @@
   "description": "Vtgate-style cluster daemon for memcache targets",
   "main": "index.js",
   "dependencies": {
+    "async": "^0.9.0",
     "lodash": "^2.4.1",
     "winston": "^0.7.3"
   },

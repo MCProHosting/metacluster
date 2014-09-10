@@ -35,8 +35,15 @@ function Pool(servers) {
             }
         }
 
-        var locals = _.where(self.servers, {local: true});
-        runOn(_.sample(locals.length || self.servers), query, callback)
+        var available = _.where(self.servers, {status: 'online'}),
+            locals = _.where(available, {local: true});
+
+        if (available.length === 0) {
+            // No need to log, we'll already have logged that they're down!
+            callback('ERROR');
+        }
+
+        runOn(_.sample(locals.length ? locals : available), query, callback)
     };
 
     /**
