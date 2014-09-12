@@ -104,4 +104,12 @@ describe('Redis command parser', function () {
         expect(out.items[0].length).toBe(5);
         expect(out.items[0].data.toString()).toBe(str);
     });
+
+    it('waits for completions', function () {
+        expect(parse('+OK\n').items.length).toBe(0);         // Missing the \r
+        expect(parse('-Error!').items.length).toBe(0);       // Missing the \r\r
+        expect(parse(':32\n').items.length).toBe(0);         // Missing the \r
+        expect(parse('*2\r\n:32\r\n').items.length).toBe(0); // Missing an element
+        expect(parse('$10\r\nfoo').items.length).toBe(0);    // Missing bytes
+    });
 });
