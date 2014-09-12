@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "node node_modules/expresso/bin/expresso node_modules/memcache/test/*.js"
+    "test": "jasmine-node spec/"
   },
   "repository": {
     "type": "git",
