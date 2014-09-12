@@ -82,4 +82,26 @@ describe('Redis command parser', function () {
         expect(parse('lala:42\r\n').isValid).toBe(false);
         expect(parse('$foo\r\nsdfdsfsdf').items.length).toBe(0);
     });
+
+    it('handles null bytes in bulk strings', function () {
+        var str = '$-1\r\n';
+        var out = parse(str);
+
+        expect(out.isValid).toBe(true);
+        expect(out.items.length).toBe(1);
+        expect(out.items[0].isComplete).toBe(true);
+        expect(out.items[0].length).toBe(5);
+        expect(out.items[0].data.toString()).toBe(str);
+    });
+
+    it('handles null bytes in arrays', function () {
+        var str = '*-1\r\n';
+        var out = parse(str);
+
+        expect(out.isValid).toBe(true);
+        expect(out.items.length).toBe(1);
+        expect(out.items[0].isComplete).toBe(true);
+        expect(out.items[0].length).toBe(5);
+        expect(out.items[0].data.toString()).toBe(str);
+    });
 });
