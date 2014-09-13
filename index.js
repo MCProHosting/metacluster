@@ -1,4 +1,4 @@
 var config = require('./config'),
-    server = require('./server');
+    server = require('./lib/server');
 
 server().listen(config.http.port, config.http.host);

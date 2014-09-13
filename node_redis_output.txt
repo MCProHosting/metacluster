@@ -1,0 +1,82 @@
+- flushdb: 9 ms
+- incr: 11 ms
+- multi_1: 16 ms
+- multi_2: 15 ms
+- multi_3: 11 ms
+- multi_4: 10 ms
+- multi_5: 5 ms
+- multi_6: 7 ms
+- multi_7: 1 ms
+- multi_exception_1: 4 ms
+- multi_8: 16 ms
+- eval_1: 29 ms
+- script_load: 16 ms
+- watch_multi: 3 ms
+- watch_transaction: 6 ms
+- detect_buffers: 12 ms
+- socket_nodelay: 17 ms
+- reconnect:reconnecting: { delay: 255, attempt: 2 }
+ 262 ms
+- select_error_emits_if_no_callback: 6 ms
+- idle: 1 ms
+- hset: 6 ms
+- hlen: 3 ms
+- hmset_buffer_and_array: 2 ms
+- hmget: 10 ms
+- hincrby: 2 ms
+- exists: 4 ms
+- del: 5 ms
+- type: 27 ms
+- keys: 3 ms
+- multibulk: 8 ms
+- multibulk_zero_length: 139 ms
+- randomkey: 2 ms
+- rename: 4 ms
+- renamenx: 8 ms
+- dbsize: 2 ms
+- get_1: 1 ms
+- get_2: 1 ms
+- set: 2 ms
+- getset: 2 ms
+- mget: 4 ms
+- setnx: 4 ms
+- setex: 3 ms
+- msetnx: 5 ms
+- hgetall: 3 ms
+- hgetall_message: 2 ms
+- hgetall_null: 0 ms
+- utf8: 4 ms
+- sadd: 3 ms
+- sadd2: 4 ms
+- sismember: 11 ms
+- scard: 5 ms
+- srem: 4 ms
+- srem2: 7 ms
+- spop: 4 ms
+- sdiff: 7 ms
+- sdiffstore: 9 ms
+- smembers: 10 ms
+- smove: 5 ms
+- sinter: 12 ms
+- sinterstore: 10 ms
+- sunion: 10 ms
+- sunionstore: 19 ms
+- sort: 34 ms
+- expire: 2003 ms
+- ttl: 502 ms
+- optional_callback: 9 ms
+- optional_callback_undefined: 3 ms
+- enable_offline_queue_true:node_redis: Couldn't get Redis connection after 1 attempts.
+node_redis: Couldn't get Redis connection after 1 attempts.
+ 76 ms
+- enable_offline_queue_false:node_redis: Couldn't get Redis connection after 1 attempts.
+node_redis: Couldn't get Redis connection after 1 attempts.
+ 51 ms
+- slowlog: 5 ms
+- domain: 2 ms
+- auth: 862 ms
+- auth2: 449 ms
+- reconnectretrymaxdelay: 9 ms
+- unref: 504 ms
+
+  completed 76 tests in 5380 ms

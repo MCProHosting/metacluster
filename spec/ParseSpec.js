@@ -78,6 +78,31 @@ describe('Redis command parser', function () {
         expect(out.items[1].data.toString()).toBe('$6\r\nfoobar\r\n');
     });
 
+    it('parses multi-nested edge cases', function () {
+        var str = '*4\r\n' +
+            '*4\r\n' +
+            '$5\r\n' +
+            'mem 4\r\n' +
+            '$5\r\n' +
+            'mem 2\r\n' +
+            '$5\r\n' +
+            'mem 3\r\n' +
+            '$5\r\n' +
+            'mem 1\r\n' +
+            ':1\r\n' +
+            '*0\r\n' +
+            ':0\r\n';
+        var out = parse(str);
+
+        expect(out.isValid).toBe(true);
+        expect(out.items.length).toBe(1);
+
+        expect(out.items[0].isComplete).toBe(true);
+        expect(out.items[0].items.length).toBe(4);
+        expect(out.items[0].items[0].items.length).toBe(4);
+        expect(out.items[0].data.toString()).toBe(str);
+    });
+
     it('doesnt fail on stupid data', function () {
         expect(parse('lala:42\r\n').isValid).toBe(false);
         expect(parse('$foo\r\nsdfdsfsdf').items.length).toBe(0);
